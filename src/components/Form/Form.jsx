@@ -1,7 +1,10 @@
 import { Formik } from 'formik';
 import { Form, ErrorMessage, Field, Button, Label } from './Form.styled';
 import * as Yup from 'yup';
-import { useContacts } from 'hooks/useContacts';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectContacts } from 'redux/selectors';
+import { toast } from 'react-hot-toast';
+import { addContact } from 'redux/operations';
 
 const ContactSchema = Yup.object().shape({
   name: Yup.string()
@@ -15,7 +18,26 @@ const ContactSchema = Yup.object().shape({
 });
 
 export const ContactForm = () => {
-  const { addContact } = useContacts();
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+
+  const handleSubmit = async values => {
+    const name = values.name;
+    const isExist = contacts.find(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
+    );
+    if (isExist) {
+      toast.error(`Contact with the name ${name} already exists.`);
+      return;
+    }
+    try {
+      await dispatch(addContact(values)).unwrap();
+      toast.success(`${values.name} added to your contacts`);
+    } catch (error) {
+      toast.error('Ooops! Something went wrong. Try refreshing the page');
+    }
+  };
+
   return (
     <div>
       <Formik
@@ -24,9 +46,9 @@ export const ContactForm = () => {
           number: '',
         }}
         validationSchema={ContactSchema}
-        onSubmit={(values, { resetForm }) => {
-          addContact(values);
-          resetForm();
+        onSubmit={(values, actions) => {
+          handleSubmit(values);
+          actions.resetForm();
         }}
       >
         <Form>
