@@ -6,7 +6,9 @@ export const Item = ({ name, number, id, onClick }) => {
       <ContactInfo>
         {name}: {number}
       </ContactInfo>
-      <DeleteButton onClick={() => onClick(id)}>Delete</DeleteButton>
+      <DeleteButton onClick={() => onClick({ id, name, number })}>
+        Delete
+      </DeleteButton>
     </ContactItem>
   );
 };

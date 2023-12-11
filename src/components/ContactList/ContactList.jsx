@@ -9,6 +9,14 @@ import { toast } from 'react-hot-toast';
 export const List = () => {
   const contacts = useSelector(selectFilteredContacts);
   const dispatch = useDispatch();
+  const handleClickDelete = async contact => {
+    try {
+      await dispatch(deleteContact(contact.id)).unwrap();
+      toast.success(`${contact.name} has been deleted from your contacts`);
+    } catch (error) {
+      toast.error('Ooops! Something went wrong. Try refreshing the page');
+    }
+  };
 
   return (
     <ContactList>
@@ -18,10 +26,7 @@ export const List = () => {
           id={contact.id}
           name={contact.name}
           number={contact.number}
-          onClick={() => {
-            dispatch(deleteContact(contact.id));
-            toast.error(`${contact.name} has been deleted from your contacts`);
-          }}
+          onClick={handleClickDelete}
         />
       ))}
     </ContactList>
